@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retour à l'Autel — Programme Enfants</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9832A;
+    --gold-light: #F5E2C4;
+    --gold-pale: #FDF6EC;
+    --brown: #5C3A1E;
+    --brown-mid: #8B5E3C;
+    --green: #3A6B44;
+    --green-light: #D4EAD8;
+    --blue: #2A5480;
+    --blue-light: #D4E6F5;
+    --rose: #A03A5A;
+    --rose-light: #F5D4DF;
+    --sky: #1D7FA3;
+    --sky-light: #D4EEF7;
+    --bg: #FFFDF8;
+    --text: #2C1A0E;
+    --text-mid: #5C3A1E;
+    --border: rgba(92, 58, 30, 0.15);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--brown);
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 20px,
+      rgba(201,131,42,0.07) 20px,
+      rgba(201,131,42,0.07) 21px
+    );
+  }
+  .header-inner { position: relative; z-index: 1; }
+  .header-tag {
+    display: inline-block;
+    background: var(--gold);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 900;
+    color: var(--gold-light);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .header h1 span { color: var(--gold); }
+  .header-sub {
+    color: rgba(245, 226, 196, 0.7);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .header-meta {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .header-meta-item {
+    color: var(--gold-light);
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* NAV TABS */
+  .nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    flex: 1;
+    min-width: 100px;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-mid);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-tab:hover { background: var(--gold-pale); }
+  .nav-tab.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+    background: var(--gold-pale);
+  }
+  .nav-tab .tab-day { font-size: 0.7rem; font-weight: 600; opacity: 0.6; display: block; }
+
+  /* CONTENT */
+  .content { padding: 2rem 1.5rem; max-width: 860px; margin: 0 auto; }
+
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  /* DAY HEADER */
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .day-badge {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+  }
+  .day-badge.j1 { background: var(--gold-light); }
+  .day-badge.j2 { background: var(--green-light); }
+  .day-badge.j3 { background: var(--blue-light); }
+  .day-title h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--brown);
+  }
+  .day-title .day-theme {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-top: 3px;
+  }
+  .day-title .day-ref {
+    font-size: 0.82rem;
+    color: var(--text-mid);
+    margin-top: 3px;
+    font-style: italic;
+  }
+
+  /* ACTIVITY CARDS */
+  .activities { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .activity {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: white;
+  }
+  .activity-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  .activity-header:hover { background: var(--gold-pale); }
+
+  .activity-type {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .type-histoire { background: var(--gold-light); color: var(--brown); }
+  .type-jeu { background: var(--green-light); color: var(--green); }
+  .type-atelier { background: var(--blue-light); color: var(--blue); }
+  .type-priere { background: var(--rose-light); color: var(--rose); }
+  .type-chant { background: var(--sky-light); color: var(--sky); }
+  .type-defi { background: #EDE9FE; color: #5B21B6; }
+  .type-jeu-exterieur { background: #D1FAE5; color: #065F46; }
+
+  .activity-title {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .activity-duration {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .activity-arrow {
+    font-size: 0.7rem;
+    color: var(--text-mid);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .activity.open .activity-arrow { transform: rotate(180deg); }
+
+  .activity-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .activity.open .activity-body { display: block; }
+
+  .activity-body .obj {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: var(--gold-pale);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--brown);
+    border-left: 3px solid var(--gold);
+  }
+
+  .activity-body p {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-top: 0.75rem;
+  }
+
+  .activity-body h4 {
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-mid);
+    margin-top: 1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .activity-body ul {
+    padding-left: 1.2rem;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .activity-body ul li { margin-bottom: 2px; }
+
+  .step-list {
+    list-style: none;
+    padding: 0;
+    counter-reset: steps;
+    margin-top: 0.75rem;
+  }
+  .step-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    align-items: flex-start;
+  }
+  .step-list li::before {
+    content: counter(steps);
+    background: var(--gold);
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .verse-block {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: var(--rose-light);
+    border-left: 3px solid var(--rose);
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--rose);
+    font-weight: 600;
+  }
+
+  .materiel-block {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: var(--blue-light);
+    border-left: 3px solid var(--blue);
+    font-size: 0.82rem;
+    color: var(--blue);
+  }
+  .materiel-block strong { font-weight: 800; display: block; margin-bottom: 4px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; }
+
+  .tip-block {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: var(--green-light);
+    border-left: 3px solid var(--green);
+    font-size: 0.82rem;
+    color: var(--green);
+    font-weight: 600;
+  }
+  .tip-block strong { font-weight: 800; }
+
+  /* OVERVIEW */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .overview-card {
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .overview-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(92,58,30,0.08); }
+  .overview-card .oc-day { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .oc-j1 .oc-day { color: var(--gold); }
+  .oc-j2 .oc-day { color: var(--green); }
+  .oc-j3 .oc-day { color: var(--blue); }
+  .overview-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--brown);
+    margin-bottom: 6px;
+  }
+  .overview-card p { font-size: 0.82rem; color: var(--text-mid); line-height: 1.5; }
+  .oc-count { font-size: 0.78rem; font-weight: 800; margin-top: 10px; }
+  .oc-j1 .oc-count { color: var(--gold); }
+  .oc-j2 .oc-count { color: var(--green); }
+  .oc-j3 .oc-count { color: var(--blue); }
+
+  .overview-intro {
+    background: var(--brown);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--gold-light);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .overview-intro h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-mid);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 500px) {
+    .content { padding: 1.5rem 1rem; }
+    .day-badge { width: 56px; height: 56px; font-size: 1.4rem; }
+    .day-title h2 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-tag">Retraite spirituelle des familles</div>
+    <h1>Retour à <span>l'Autel</span></h1>
+    <p class="header-sub">Programme enfants · 6 à 11 ans · 3 jours</p>
+    <div class="header-meta">
+      <span class="header-meta-item"><span class="dot"></span> 3 thèmes progressifs</span>
+      <span class="header-meta-item"><span class="dot"></span> 6 à 7 activités / jour</span>
+      <span class="header-meta-item"><span class="dot"></span> Histoire, jeux, ateliers</span>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-tab active" data-panel="overview">
+    <span class="tab-day">Vue d'ensemble</span>
+    3 jours
+  </button>
+  <button class="nav-tab" data-panel="jour1">
+    <span class="tab-day">Jour 1</span>
+    Dieu m'appelle
+  </button>
+  <button class="nav-tab" data-panel="jour2">
+    <span class="tab-day">Jour 2</span>
+    Je le suis
+  </button>
+  <button class="nav-tab" data-panel="jour3">
+    <span class="tab-day">Jour 3</span>
+    Je bénis
+  </button>
+</nav>
+
+<div class="content">
+
+  <!-- OVERVIEW -->
+  <div class="day-panel active" id="panel-overview">
+    <div class="overview-intro">
+      <h3>L'arc narratif des 3 jours</h3>
+      <p>Chaque journée construit sur la précédente. Le jour 1, les enfants découvrent que Dieu les connaît et les appelle par leur nom. Le jour 2, ils explorent ce que signifie le suivre concrètement. Le jour 3 est le grand tournant : ils comprennent qu'ils peuvent être une bénédiction active pour leur famille — pas plus tard, maintenant.</p>
+    </div>
+    <div class="overview-grid">
+      <div class="overview-card oc-j1" onclick="switchTo('jour1')">
+        <div class="oc-day">Jour 1</div>
+        <h3>"Dieu m'appelle"</h3>
+        <p>Construire une relation vivante avec Dieu. L'autel comme lieu de rencontre intime.</p>
+        <div class="oc-count">6 activités · ~5h de programme</div>
+      </div>
+      <div class="overview-card oc-j2" onclick="switchTo('jour2')">
+        <div class="oc-day">Jour 2</div>
+        <h3>"Je suis disciple"</h3>
+        <p>Être un disciple actif, c'est quoi ? On ne grandit pas seul.</p>
+        <div class="oc-count">7 activités · ~5h de programme</div>
+      </div>
+      <div class="overview-card oc-j3" onclick="switchTo('jour3')">
+        <div class="oc-day">Jour 3</div>
+        <h3>"Je bénis ma famille"</h3>
+        <p>De grands retours vers les parents. Les enfants deviennent acteurs de la retraite.</p>
+        <div class="oc-count">6 activités · ~4h de programme</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Histoire biblique</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Jeu / défi</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>Atelier créatif</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--rose)"></span>Prière</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--sky)"></span>Chant / louange</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#5B21B6"></span>Défi</div>
+    </div>
+  </div>
+
+  <!-- JOUR 1 -->
+  <div class="day-panel" id="panel-jour1">
+    <div class="day-header">
+      <div class="day-badge j1">🔥</div>
+      <div class="day-title">
+        <h2>Jour 1 — Dieu m'appelle</h2>
+        <div class="day-theme" style="color:var(--gold)">L'autel comme lieu de rencontre</div>
+        <div class="day-ref">Référence principale : Genèse 12 · Abraham bâtit un autel</div>
+      </div>
+    </div>
+    <div class="activities">
+
+      <!-- A1 -->
+      <div class="activity" id="a1">
+        <div class="activity-header" onclick="toggle('a1')">
+          <span class="activity-type type-chant">Chant</span>
+          <span class="activity-title">Le feu de camp de Dieu — Ouverture musicale</span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : créer un sentiment de groupe, ancrer l'atmosphère "retour à l'autel" dès l'arrivée.</div>
+          <p>Accueillez les enfants assis en cercle autour d'un "feu de camp" symbolique — un bouquet de bougies LED colorées au centre. Chantez 2-3 chants de louange animés que les enfants connaissent. Puis introduisez avec mystère : <em>"Aujourd'hui, on part en expédition. Comme les grands explorateurs de la Bible, on cherche quelque chose de précieux..."</em></p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Bougies LED, cercle de coussinets ou tapis, playlist de louange enfants prête
+          </div>
+        </div>
+      </div>
+
+      <!-- A2 -->
+      <div class="activity" id="a2">
+        <div class="activity-header" onclick="toggle('a2')">
+          <span class="activity-type type-histoire">Histoire</span>
+          <span class="activity-title">Abraham et le premier autel — Récit vivant avec accessoires</span>
+          <span class="activity-duration">30 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : comprendre que l'autel est un lieu où on dit à Dieu "Tu es là, je T'appartiens".</div>
+          <p>Racontez l'histoire d'Abraham (Genèse 12 et 22) avec des accessoires : une grande carte dessinée à la main représentant le voyage, des "pierres" (cailloux peints ou en mousse), un petit agneau en peluche. Utilisez le principe du "voyage avec Dieu" — chaque fois qu'Abraham s'arrête, il construit un autel.</p>
+          <h4>Structure narrative</h4>
+          <ol class="step-list">
+            <li>Dieu parle à Abraham dans le silence. (Posez une grande oreille en carton.) <em>"Dieu parle à ceux qui s'arrêtent pour écouter."</em></li>
+            <li>Abraham fait confiance et se met en route. (Les enfants se lèvent et marchent en place.)</li>
+            <li>Abraham construit son premier autel. (Chaque enfant pose une "pierre" sur le tas central.) <em>"C'est comme dire : Dieu, je m'arrête ici pour Te remercier."</em></li>
+            <li>Abraham continue malgré les peurs. Question aux enfants : <em>"Vous avez déjà eu peur et prié quand même ?"</em></li>
+          </ol>
+          <div class="verse-block">"L'Éternel dit à Abram : Va-t'en de ton pays... Je te bénirai et tu seras une bénédiction." (Genèse 12:1-2)</div>
+          <div class="tip-block"><strong>Tip animateur :</strong> gardez de vraies pierres lisses à décorer lors de l'atelier du soir — le lien visuel sera puissant.</div>
+        </div>
+      </div>
+
+      <!-- A3 -->
+      <div class="activity" id="a3">
+        <div class="activity-header" onclick="toggle('a3')">
+          <span class="activity-type type-jeu">Jeu</span>
+          <span class="activity-title">La course des messages — Jeu de relais biblique</span>
+          <span class="activity-duration">25 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : se rappeler que Dieu nous parle et qu'il faut "transmettre le message" — thème du disciple.</div>
+          <p>Dehors ou dans une grande salle. Formez 3 équipes. À l'une des extrémités, un animateur lit à voix basse un "message de Dieu" (verset court). Le premier enfant court jusqu'aux autres et le chuchote en chaîne. Le dernier enfant court vers une boîte aux lettres géante et dépose le message écrit sur un carton.</p>
+          <h4>Variante "obstacles de vie"</h4>
+          <p>Placez des obstacles entre les équipes (cerceaux à enjamber, tunnel à passer) qui représentent les difficultés : peur, doute, découragement. L'enfant doit quand même transmettre le message.</p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Boîte aux lettres décorée "À Dieu", cartons pré-imprimés avec versets courts, obstacles de jeu, chronomètre
+          </div>
+          <div class="verse-block">Verset du jeu : "Ne crains pas, car Je suis avec toi." (Ésaïe 41:10)</div>
+        </div>
+      </div>
+
+      <!-- A4 -->
+      <div class="activity" id="a4">
+        <div class="activity-header" onclick="toggle('a4')">
+          <span class="activity-type type-atelier">Atelier</span>
+          <span class="activity-title">Ma pierre d'autel — Décoration d'une pierre de promesse</span>
+          <span class="activity-duration">35 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : créer un objet personnel qui symbolise leur engagement avec Dieu — souvenir physique qu'ils garderont.</div>
+          <p>Chaque enfant reçoit une pierre lisse (galets de rivière). Avec des marqueurs permanents et de la peinture pour tissu, ils dessinent : leur prénom, un symbole qui représente Dieu pour eux, et une petite flamme (symbole de l'autel). Un verset choisi par eux peut y être écrit.</p>
+          <h4>Animation pendant l'atelier</h4>
+          <p>L'animateur passe de table en table et demande : <em>"Si tu pouvais dire UNE chose à Dieu maintenant, ce serait quoi ?"</em> Pas de jugement, juste l'écoute. Ces réponses deviendront les prières du soir.</p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            1 galet par enfant (préparé à l'avance), marqueurs Posca ou similaires, vernis transparent (optionnel), journaux de protection de table
+          </div>
+          <div class="tip-block"><strong>Souvenir durable :</strong> cette pierre sera remise aux parents lors du grand rassemblement du jour 3. Gardez-les précieusement.</div>
+        </div>
+      </div>
+
+      <!-- A5 -->
+      <div class="activity" id="a5">
+        <div class="activity-header" onclick="toggle('a5')">
+          <span class="activity-type type-defi">Défi</span>
+          <span class="activity-title">Le défi "5 minutes avec Dieu" — Introduction à la prière personnelle</span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : expérimenter concrètement ce qu'est "revenir à l'autel" — s'arrêter et parler à Dieu seul.</div>
+          <p>Installez 5 "stations de prière" dans la salle (ou dans le jardin si possible), chacune avec une petite affiche : <strong>Merci / Pardon / S'il Te plaît / Écoute / Je T'aime</strong>. Chaque enfant circule librement et passe 1 minute à chaque station.</p>
+          <h4>Déroulement</h4>
+          <ol class="step-list">
+            <li>Expliquez : <em>"L'autel, c'est l'endroit où on rencontre Dieu. Aujourd'hui, tu peux faire ton autel n'importe où."</em></li>
+            <li>Donnez un carnet petit format à chaque enfant — leur "journal d'autel" pour les 3 jours.</li>
+            <li>5 minutes de silence (ou musique instrumentale douce) pendant la circulation.</li>
+            <li>Retour en cercle : qui veut partager ce qu'il a dit à Dieu ? (Toujours volontaire, jamais forcé.)</li>
+          </ol>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            5 affiches de station plastifiées, petits carnets (1 par enfant), stylos, musique instrumentale
+          </div>
+        </div>
+      </div>
+
+      <!-- A6 -->
+      <div class="activity" id="a6">
+        <div class="activity-header" onclick="toggle('a6')">
+          <span class="activity-type type-priere">Prière</span>
+          <span class="activity-title">Le cercle des voix — Clôture du jour 1</span>
+          <span class="activity-duration">15 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : ancrer le sentiment que Dieu entend chaque voix, même petite.</div>
+          <p>En cercle, les enfants tiennent leur pierre d'autel. L'animateur commence une prière courte, puis passe la parole : chaque enfant peut dire un mot ou une phrase à Dieu — ou passer en silence. Finissez par chanter ensemble une phrase simple répétée : <em>"Tu es là, Tu m'aimes, Je reviens à Toi."</em> (sur un air simple que vous inventez ensemble).</p>
+          <div class="tip-block"><strong>Note :</strong> ce rituel de fin de journée sera répété chaque soir, avec variations. Il crée un sentiment de sécurité et de cohérence sur les 3 jours.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JOUR 2 -->
+  <div class="day-panel" id="panel-jour2">
+    <div class="day-header">
+      <div class="day-badge j2">🌿</div>
+      <div class="day-title">
+        <h2>Jour 2 — Je suis disciple</h2>
+        <div class="day-theme" style="color:var(--green)">Être actif dans la marche avec Dieu</div>
+        <div class="day-ref">Référence principale : Marc 1:16-20 · Les disciples sont appelés</div>
+      </div>
+    </div>
+    <div class="activities">
+
+      <!-- B1 -->
+      <div class="activity" id="b1">
+        <div class="activity-header" onclick="toggle('b1')">
+          <span class="activity-type type-histoire">Histoire</span>
+          <span class="activity-title">Pierre et les filets — La vocation qui surprend</span>
+          <span class="activity-duration">25 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : comprendre que suivre Jésus, c'est une décision active, pas juste croire dans sa tête.</div>
+          <p>Racontez l'appel des disciples avec une mise en scène participative. Donnez à quelques enfants de vrais filets (ou des cordes) et des "poissons" en papier. Ils jouent les pêcheurs. Au moment où Jésus appelle, l'animateur joue Jésus et s'approche. <em>"Laisse tes filets. Viens. Je ferai de toi un pêcheur d'hommes."</em></p>
+          <h4>Discussion après le récit</h4>
+          <ul>
+            <li>Qu'est-ce que Pierre a laissé ? (Sa sécurité, son métier, ce qu'il connaissait.)</li>
+            <li>Qu'est-ce que toi tu pourrais "laisser" pour mieux suivre Jésus ? (Temps d'écran, mauvaise attitude, jalousie...)</li>
+            <li>Un disciple actif fait quoi dans sa semaine ?</li>
+          </ul>
+          <div class="verse-block">"Venez à ma suite, et je vous ferai pêcheurs d'hommes." (Marc 1:17)</div>
+        </div>
+      </div>
+
+      <!-- B2 -->
+      <div class="activity" id="b2">
+        <div class="activity-header" onclick="toggle('b2')">
+          <span class="activity-type type-jeu-exterieur">Jeu extérieur</span>
+          <span class="activity-title">L'expédition du disciple — Parcours d'obstacles avec missions</span>
+          <span class="activity-duration">40 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : expérimenter physiquement ce que signifie "aller" — sortir de sa zone de confort, s'entraider.</div>
+          <p>Créez un parcours en plein air avec 6 stations. À chaque station, une "mission du disciple" doit être accomplie EN ÉQUIPE avant de passer à la suivante.</p>
+          <h4>Les 6 stations-missions</h4>
+          <ol class="step-list">
+            <li><strong>La tempête :</strong> traverser un espace les yeux bandés guidés par la voix d'un coéquipier. → Confiance.</li>
+            <li><strong>Le pain partagé :</strong> 1 biscuit divisé en autant de morceaux qu'il y a d'enfants dans l'équipe. → Générosité.</li>
+            <li><strong>La prière de 30 secondes :</strong> tout le monde pose la main sur l'épaule du voisin et prie ensemble à voix haute. → Communion.</li>
+            <li><strong>Le message caché :</strong> déchiffrer un verset en code (lettres mélangées). → Parole de Dieu.</li>
+            <li><strong>Le fardeau :</strong> transporter un sac lesté ensemble sans que personne ne lâche. → Portez-vous les uns les autres.</li>
+            <li><strong>L'encouragement :</strong> chaque enfant dit quelque chose de positif sur la personne à sa droite. → Édification.</li>
+          </ol>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Bandeaux, biscuits, versets codés imprimés, sac avec poids léger, chrono, cloches ou sifflets par station
+          </div>
+        </div>
+      </div>
+
+      <!-- B3 -->
+      <div class="activity" id="b3">
+        <div class="activity-header" onclick="toggle('b3')">
+          <span class="activity-type type-atelier">Atelier</span>
+          <span class="activity-title">Mon "carnet de disciple" — Page créative de mi-retraite</span>
+          <span class="activity-duration">30 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : mettre en mots et en images ce que signifie être disciple pour chacun.</div>
+          <p>Dans leur journal d'autel (commencé hier), les enfants créent une double page "Je suis disciple de Jésus". Avec des magazines, feutres, autocollants et photos imprimées, ils collent : une chose qu'ils font pour Dieu cette semaine, une personne dans leur famille pour qui ils prient, et un talent qu'ils veulent mettre au service de Dieu.</p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Magazines à découper, colle, ciseaux, photos de famille (demandez aux parents d'en apporter), gommettes, feutres
+          </div>
+          <div class="tip-block"><strong>Astuce :</strong> préparez à l'avance des "stickers" maison avec des icônes bibliques (croix, colombe, pain, poisson) à distribuer.</div>
+        </div>
+      </div>
+
+      <!-- B4 -->
+      <div class="activity" id="b4">
+        <div class="activity-header" onclick="toggle('b4')">
+          <span class="activity-type type-histoire">Histoire</span>
+          <span class="activity-title">Le garçon aux 5 pains — Même un enfant peut tout changer</span>
+          <span class="activity-duration">25 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : briser la fausse idée qu'ils sont "trop petits" pour faire quelque chose pour Dieu.</div>
+          <p>Racontez Jean 6:1-14 sous forme d'interview. Un animateur joue le journaliste qui interroge "le petit garçon" (joué par un enfant volontaire) après le miracle. Questions du journaliste : <em>"Comment tu t'appelais ? T'as vraiment donné ton repas ? T'avais pas peur ? Tu savais ce qu'il allait faire ?"</em></p>
+          <p>Le point central : le garçon ne savait pas ce que Jésus allait faire. Il a juste donné ce qu'il avait. Jésus a fait le reste.</p>
+          <div class="verse-block">"Il y a ici un enfant qui a cinq pains d'orge et deux poissons. Mais qu'est-ce que cela pour tant de gens ?" (Jean 6:9)</div>
+          <h4>Activité rapide après l'histoire</h4>
+          <p>Chaque enfant écrit sur un "pain" en papier : <em>"Ce que je donne à Jésus, c'est..."</em>. On les place tous dans un panier. L'animateur les lit à voix haute, sans nommer les auteurs, en remerciant Dieu pour chaque don.</p>
+        </div>
+      </div>
+
+      <!-- B5 -->
+      <div class="activity" id="b5">
+        <div class="activity-header" onclick="toggle('b5')">
+          <span class="activity-type type-jeu">Jeu</span>
+          <span class="activity-title">Le grand jeu des dons — Découverte des talents</span>
+          <span class="activity-duration">30 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : chaque enfant découvre ou nomme un don qu'il a reçu de Dieu.</div>
+          <p>Créez 8 "îles de talents" dans la salle, chacune avec une activité de 3 minutes : chanter, dessiner, consoler (écouter un ami triste joué par un animateur), calculer vite, faire rire, raconter une histoire, construire (avec des Lego ou kapla), et servir (mettre la table rapidement). Les enfants tournent librement et notent dans leur carnet les 2 îles où ils se sentent les plus à l'aise.</p>
+          <p>Retour en cercle : <em>"Dieu t'a donné ce don pour toi ? Non — pour ta famille, pour ton église, pour le monde."</em></p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            8 panneaux "île", activités préparées à chaque station, chronomètre, petite cloche pour signal de rotation
+          </div>
+        </div>
+      </div>
+
+      <!-- B6 -->
+      <div class="activity" id="b6">
+        <div class="activity-header" onclick="toggle('b6')">
+          <span class="activity-type type-defi">Défi</span>
+          <span class="activity-title">Mission secrète pour ma famille — Préparation surprise du jour 3</span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : préparer le moment fort du lendemain — les enfants deviennent "agents de bénédiction" pour leurs parents.</div>
+          <p>En secret (comme une vraie mission), chaque enfant reçoit une enveloppe "TOP SECRET". À l'intérieur : une feuille pour écrire ou dessiner une lettre à ses parents. Titre proposé : <em>"Voici comment je veux bénir notre famille."</em> L'animateur aide les plus jeunes à formuler leurs pensées. Ces lettres seront remises le lendemain.</p>
+          <p>Insistez sur le côté mystérieux et précieux : <em>"Tes parents ne savent pas ce qui les attend. Tu es en train de préparer quelque chose qu'ils n'oublieront jamais."</em></p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Enveloppes kraft, feuilles décorées, stylos et feutres, petits stickers "secret mission", colle pour fermer l'enveloppe
+          </div>
+        </div>
+      </div>
+
+      <!-- B7 -->
+      <div class="activity" id="b7">
+        <div class="activity-header" onclick="toggle('b7')">
+          <span class="activity-type type-priere">Prière</span>
+          <span class="activity-title">Prière des mains — Clôture du jour 2</span>
+          <span class="activity-duration">15 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : ancrer l'idée que prier pour les autres, c'est être disciple.</div>
+          <p>Chaque enfant trace le contour de sa main sur une feuille. Sur chaque doigt, il écrit le prénom d'une personne de sa famille pour qui il veut prier. L'animateur guide une prière courte pour chaque "catégorie" : papa/maman, frères et sœurs, grands-parents, famille élargie, famille de l'église. Ces mains sont placées sur le "mur de prière" installé dans la salle — visible pour les 3 jours.</p>
+          <div class="tip-block"><strong>Impact visuel :</strong> au jour 3, ce mur de mains sera montré aux parents. Très émouvant.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JOUR 3 -->
+  <div class="day-panel" id="panel-jour3">
+    <div class="day-header">
+      <div class="day-badge j3">✨</div>
+      <div class="day-title">
+        <h2>Jour 3 — Je bénis ma famille</h2>
+        <div class="day-theme" style="color:var(--blue)">Être une bénédiction active, maintenant</div>
+        <div class="day-ref">Référence principale : Genèse 12:2 · "Tu seras une bénédiction"</div>
+      </div>
+    </div>
+    <div class="activities">
+
+      <!-- C1 -->
+      <div class="activity" id="c1">
+        <div class="activity-header" onclick="toggle('c1')">
+          <span class="activity-type type-histoire">Histoire</span>
+          <span class="activity-title">Jacob et l'autel de Béthel — Recommencer après une chute</span>
+          <span class="activity-duration">25 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : comprendre que "retour à l'autel" signifie aussi recommencer quand on a fait des erreurs.</div>
+          <p>Racontez Genèse 35:1-7 : Dieu dit à Jacob de "retourner à Béthel" — de revenir à l'endroit où il avait rencontré Dieu pour la première fois. Jacob avait fait des erreurs, était loin. Mais Dieu lui dit : <em>"Reviens. Rebâtis l'autel."</em></p>
+          <h4>Application concrète</h4>
+          <p>Posez la question : <em>"Est-ce qu'il t'arrive d'être loin de Dieu ? De t'endormir le soir sans lui parler, de mal traiter un frère ou une sœur, de ne plus aller à l'église avec joie ?"</em> Laissez répondre. Puis : <em>"Retourner à l'autel, c'est revenir. Dieu t'attend toujours là où tu L'as connu."</em></p>
+          <div class="verse-block">"Lève-toi, monte à Béthel... et fais-y un autel au Dieu qui t'est apparu." (Genèse 35:1)</div>
+          <p>Terminez avec une courte confession collective silencieuse, suivie d'une déclaration de pardon joyeuse prononcée par l'animateur.</p>
+        </div>
+      </div>
+
+      <!-- C2 -->
+      <div class="activity" id="c2">
+        <div class="activity-header" onclick="toggle('c2')">
+          <span class="activity-type type-atelier">Atelier</span>
+          <span class="activity-title">Le "Tableau de bénédiction" familial — Création collective grand format</span>
+          <span class="activity-duration">45 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : créer un objet visuel, beau et porteur de sens, que les enfants offriront à leurs parents à la fin.</div>
+          <p>Sur une grande feuille (ou toile de papier kraft) par famille, les enfants créent un "tableau de bénédiction". Format libre mais guidé par 3 zones :</p>
+          <ul>
+            <li><strong>Zone 1 — Ce que j'aime dans notre famille :</strong> dessins, mots, petites photos.</li>
+            <li><strong>Zone 2 — Ce que je demande à Dieu pour nous :</strong> prières illustrées.</li>
+            <li><strong>Zone 3 — Ma promesse :</strong> l'enfant trace sa main et écrit sa promesse à l'intérieur.</li>
+          </ul>
+          <p>Si les enfants d'une même famille sont plusieurs dans le groupe, ils travaillent ensemble. Les enfants uniques peuvent faire un tableau de leur famille de l'église.</p>
+          <div class="materiel-block">
+            <strong>Matériel</strong>
+            Grandes feuilles kraft (1 par famille), peinture dorée, feutres, photos imprimées, stickers, craies grasses
+          </div>
+          <div class="tip-block"><strong>Conservation :</strong> ce tableau sera roulé et attaché avec un ruban — offert lors de la cérémonie finale.</div>
+        </div>
+      </div>
+
+      <!-- C3 -->
+      <div class="activity" id="c3">
+        <div class="activity-header" onclick="toggle('c3')">
+          <span class="activity-type type-jeu">Jeu</span>
+          <span class="activity-title">Le grand quiz "Disciples en action" — Révision festive des 3 jours</span>
+          <span class="activity-duration">25 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : ancrer les apprentissages des 3 jours dans un moment de joie partagée.</div>
+          <p>Quiz en équipes avec des questions sur les 3 jours : histoires bibliques entendues, défis réalisés, versets appris. Format dynamique : buzzer (frapper sur une boîte), déplacements physiques (vrai = à droite, faux = à gauche), mimes (faire deviner un personnage biblique).</p>
+          <h4>Exemples de questions</h4>
+          <ul>
+            <li>Quel patriarche a construit les premiers autels en voyageant ? (Abraham)</li>
+            <li>Qu'est-ce que Pierre a laissé pour suivre Jésus ? (Ses filets)</li>
+            <li>Le petit garçon avait combien de pains et de poissons ? (5 pains, 2 poissons)</li>
+            <li>Complétez : "Tu seras une..." (bénédiction)</li>
+            <li>Vrai ou faux : on doit être grand pour être disciple ? (Faux)</li>
+          </ul>
+          <div class="tip-block"><strong>Tous gagnants :</strong> à la fin du quiz, chaque équipe reçoit un prix identique (petite douceur) — le but est la célébration, pas la compétition.</div>
+        </div>
+      </div>
+
+      <!-- C4 -->
+      <div class="activity" id="c4">
+        <div class="activity-header" onclick="toggle('c4')">
+          <span class="activity-type type-defi">Défi</span>
+          <span class="activity-title">Les "Messagers de bénédiction" — Répétition de la cérémonie finale</span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : préparer les enfants à BIEN vivre le grand moment de la remise — ne pas le gâcher par la timidité.</div>
+          <p>Expliquez ce qui va se passer lors de la cérémonie avec les parents. Puis répétez : comment marcher, comment tenir le tableau et la pierre, comment regarder leurs parents dans les yeux en disant la phrase préparée ensemble :</p>
+          <div class="verse-block" style="font-style:normal; font-size: 0.92rem;">"Papa, Maman — pendant ces 3 jours, j'ai appris que je peux être une bénédiction pour notre famille. Voici ma promesse."</div>
+          <p>Les enfants s'entraînent 2-3 fois, d'abord entre eux, puis avec un animateur qui joue "le parent". Encouragez les plus timides avec des applaudissements.</p>
+        </div>
+      </div>
+
+      <!-- C5 -->
+      <div class="activity" id="c5">
+        <div class="activity-header" onclick="toggle('c5')">
+          <span class="activity-type type-chant">Chant</span>
+          <span class="activity-title">Le chant de l'autel — Créer ensemble la chanson de la retraite</span>
+          <span class="activity-duration">20 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj">Objectif : les enfants apportent quelque chose de vivant, créé par eux, lors de la cérémonie finale.</div>
+          <p>Pendant les 3 jours, l'animateur a collecté des mots-clés des enfants (lors des prières, des partages). Avec ces mots, vous créez ensemble un refrain simple sur un air connu. Par exemple, sur l'air d'une chanson populaire adventiste :</p>
+          <div class="verse-block" style="font-style:normal; background: var(--sky-light); border-color: var(--sky); color: var(--sky);">
+            "Je reviens à Toi Seigneur / Avec tout mon cœur / Tu m'appelles par mon nom / Je dis oui à Ta saison"
+          </div>
+          <p>Les enfants chantent ce refrain lors de la cérémonie avec les parents. Simple, répétitif, chanté de mémoire — puissant.</p>
+          <div class="tip-block"><strong>Option :</strong> si un enfant joue d'un instrument, proposez-lui de l'accompagner. C'est son moment de don.</div>
+        </div>
+      </div>
+
+      <!-- C6 — CEREMONIE -->
+      <div class="activity" id="c6" style="border: 2px solid var(--gold);">
+        <div class="activity-header" onclick="toggle('c6')" style="background: var(--gold-pale);">
+          <span class="activity-type" style="background:var(--gold); color:white;">Cérémonie</span>
+          <span class="activity-title" style="color:var(--brown); font-size:1rem;">🎉 Grand rassemblement — Remise des cadeaux aux parents</span>
+          <span class="activity-duration" style="color:var(--brown);">40 min</span>
+          <span class="activity-arrow">▼</span>
+        </div>
+        <div class="activity-body">
+          <div class="obj" style="background:var(--gold-light); border-color:var(--gold);">MOMENT FORT : les enfants rejoignent leurs parents pour la conclusion de la retraite.</div>
+          <h4>Déroulement de la cérémonie</h4>
+          <ol class="step-list">
+            <li><strong>Entrée des enfants en procession</strong> tenant leur pierre d'autel, chantant le refrain créé ensemble. Les parents les attendent assis.</li>
+            <li><strong>Présentation du mur de prière</strong> : un animateur montre aux parents le mur de mains du jour 2 et explique brièvement ce qui a été vécu.</li>
+            <li><strong>Remise des cadeaux</strong> : chaque enfant va trouver ses parents et leur remet la pierre d'autel + le tableau de bénédiction + la lettre secrète, en prononçant la phrase apprise.</li>
+            <li><strong>Bénédiction parentale</strong> : les parents posent la main sur la tête de leur enfant et disent simplement : "Je te bénis, et je suis fier(e) de toi." (Guidé par le responsable de la retraite.)</li>
+            <li><strong>Chant final ensemble</strong> : parents et enfants chantent le refrain de la retraite ensemble.</li>
+            <li><strong>Prière de clôture</strong> par le pasteur ou l'animateur principal.</li>
+          </ol>
+          <div class="verse-block">"Je te bénirai... et tu seras une bénédiction." (Genèse 12:2)</div>
+          <div class="tip-block"><strong>Préparez les mouchoirs :</strong> ce moment a la capacité d'être profondément émouvant pour les parents. C'est l'autel de la famille qui se rebâtit.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+
+  function switchTo(panelId) {
+    document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + panelId).classList.add('active');
+    document.querySelector('[data-panel="' + panelId + '"]').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchTo(tab.dataset.panel));
+  });
+</script>
+
+</body>
+</html>
